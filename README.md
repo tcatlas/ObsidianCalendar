@@ -1,10 +1,14 @@
-# ObsidianCalendar
+# Notes Calendar
 
-An Obsidian plugin that adds a calendar view in the side pane and shows notes by creation date.
+An Obsidian plugin for displaying a calendar in the side pane and notes associated with the selected date.
+
+## Screenshots
+<img width="405" height="750" alt="Notes pane display showing the calendar and notes list." src="https://github.com/user-attachments/assets/1328a8ab-2a27-45ad-8750-9a4faaff0dfb" />
+
 
 ## Features
 
-- Calendar view in the Obsidian side pane
+- Calendar view in the side pane
 - Month and year navigation
 - Click a day to show notes created on that date
 - Click a week number to show notes created during that week
@@ -12,21 +16,8 @@ An Obsidian plugin that adds a calendar view in the side pane and shows notes by
 - Optional creation time and note excerpt display
 - Configurable note sorting and excerpt line count
 
-## Requirements
-
-- Obsidian `0.12.0` or newer
-- Node.js and npm for development
-
-## Project Files
-
-```text
-main.ts                 Plugin entry point
-views/calendar-view.ts  Calendar view UI and note list logic
-settings.ts             Settings types, defaults, and settings tab UI
-styles.css              Plugin styling
-manifest.json           Obsidian plugin manifest
-package.json            Scripts and development dependencies
-```
+## Installation
+Open the Community Plugins tab in the settings and search for "Calendar Notes" (or [click here](https://obsidian.md/plugins?id=calendar-notes)).
 
 ## Development Setup
 
@@ -92,15 +83,6 @@ Example layout:
 
 After copying the files, reload Obsidian or disable and re-enable the plugin.
 
-## Usage
-
-- Open the calendar from the ribbon icon or command palette.
-- Use the left and right arrows to move between months.
-- Click the month or year in the header to jump directly.
-- Click a day to view notes created on that date.
-- Click a week number to view notes created during that week.
-- Use the plugin settings to configure note display, sorting, excerpts, week numbering, and note indicators.
-
 ## Notes
 
 - Notes are grouped by file creation time (`ctime`), not by filename or frontmatter date.
@@ -109,4 +91,4 @@ After copying the files, reload Obsidian or disable and re-enable the plugin.
 
 ## License
 
-MIT
+GPL 2.0
