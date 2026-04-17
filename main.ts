@@ -1,15 +1,32 @@
 import { Plugin, WorkspaceLeaf } from 'obsidian';
 import { CalendarView, VIEW_TYPE_CALENDAR } from './views/calendar-view';
+import {
+	CalendarPluginSettings,
+	CalendarSettingTab,
+	DEFAULT_SETTINGS,
+	normalizeExcerptLines,
+	normalizeNoteSortBy,
+	normalizeSortOrder,
+	normalizeWeekNumberDisplay,
+	normalizeTimeDisplayFormat,
+} from './settings';
 
 export default class CalendarPlugin extends Plugin {
+	settings: CalendarPluginSettings;
+
 	async onload() {
 		console.log('Loading Obsidian Calendar Plugin');
+
+		await this.loadSettings();
 
 		// Register the calendar view
 		this.registerView(
 			VIEW_TYPE_CALENDAR,
-			(leaf: WorkspaceLeaf) => new CalendarView(leaf)
+			(leaf: WorkspaceLeaf) => new CalendarView(leaf, this)
 		);
+
+		// Add settings tab
+		this.addSettingTab(new CalendarSettingTab(this.app, this));
 
 		// Add a ribbon icon to open the calendar view
 		this.addRibbonIcon('calendar-glyph', 'Open Calendar', async () => {
@@ -34,6 +51,27 @@ export default class CalendarPlugin extends Plugin {
 	onunload() {
 		console.log('Unloading Obsidian Calendar Plugin');
 		this.app.workspace.detachLeavesOfType(VIEW_TYPE_CALENDAR);
+	}
+
+	async loadSettings() {
+		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+		this.settings.timeIsoDisplay = normalizeTimeDisplayFormat(this.settings.timeIsoDisplay ?? '');
+		this.settings.excerptLines = normalizeExcerptLines(this.settings.excerptLines ?? DEFAULT_SETTINGS.excerptLines);
+		this.settings.noteSortBy = normalizeNoteSortBy(this.settings.noteSortBy ?? '');
+		this.settings.noteSortOrder = normalizeSortOrder(this.settings.noteSortOrder ?? '');
+		this.settings.weekNumberDisplay = normalizeWeekNumberDisplay(this.settings.weekNumberDisplay ?? '');
+	}
+
+	async saveSettings() {
+		await this.saveData(this.settings);
+	}
+
+	refreshCalendarView() {
+		this.app.workspace.getLeavesOfType(VIEW_TYPE_CALENDAR).forEach(leaf => {
+			if (leaf.view instanceof CalendarView) {
+				leaf.view.refresh();
+			}
+		});
 	}
 
 	async activateView() {
