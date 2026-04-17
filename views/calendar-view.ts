@@ -41,9 +41,10 @@ export class CalendarView extends ItemView {
 	async onOpen() {
 		this.createCalendarView();
 		// registerEvent automatically detaches listeners when the view is closed
-		this.registerEvent(this.app.vault.on('create', () => this.updateNotesList()));
-		this.registerEvent(this.app.vault.on('delete', () => this.updateNotesList()));
-		this.registerEvent(this.app.vault.on('rename', () => this.updateNotesList()));
+		this.registerEvent(this.app.vault.on('create', () => this.refresh()));
+		this.registerEvent(this.app.vault.on('delete', () => this.refresh()));
+		this.registerEvent(this.app.vault.on('rename', () => this.refresh()));
+		this.registerEvent(this.app.vault.on('modify', () => this.refresh()));
 		this.registerDomEvent(document, 'click', (event) => {
 			if (!this.activeHeaderSelector || !this.monthDisplayContainer) return;
 			if (!this.monthDisplayContainer.contains(event.target as Node)) {
