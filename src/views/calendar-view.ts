@@ -148,7 +148,9 @@ export class CalendarView extends ItemView {
 				const weekNumberCell = this.calendarContainer.createDiv('calendar-week-number');
 				weekNumberCell.addClass('is-clickable');
 				const weekNumberValue = weekNumberCell.createDiv('calendar-week-number-value');
-				weekNumberCell.createDiv('calendar-week-number-spacer');
+				if (this.plugin.settings.showDashes) {
+					weekNumberCell.createDiv('calendar-week-number-spacer');
+				}
 				if (this.selectedWeekStart && this.isSameDay(weekStartDate, this.selectedWeekStart)) {
 					weekNumberCell.addClass('is-selected');
 				}
@@ -170,11 +172,11 @@ export class CalendarView extends ItemView {
 				const dayNumber = dayCell.createDiv('calendar-day-number');
 				dayNumber.setText(day.toString());
 
-				// Dash indicators — always render the row to keep all cells the same height
-				const noteCount = noteCountMap.get(day) ?? 0;
-				const dashCount = this.getDashCount(noteCount);
-				const dashEl = dayCell.createDiv('calendar-day-dashes');
-				if (this.plugin.settings.showDashes && dashCount > 0) {
+				// Dash indicators
+				if (this.plugin.settings.showDashes) {
+					const noteCount = noteCountMap.get(day) ?? 0;
+					const dashCount = this.getDashCount(noteCount);
+					const dashEl = dayCell.createDiv('calendar-day-dashes');
 					for (let i = 0; i < dashCount; i++) {
 						dashEl.createSpan('calendar-day-dash');
 					}

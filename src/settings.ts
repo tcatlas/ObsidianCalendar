@@ -128,34 +128,6 @@ export class CalendarSettingTab extends PluginSettingTab {
 		containerEl.createEl('h3', { text: 'Note List' });
 
 		new Setting(containerEl)
-			.setName('Show creation time')
-			.setDesc('Display note creation time.')
-			.addToggle(toggle => toggle
-				.setValue(this.plugin.settings.showTime)
-				.onChange(async (value) => {
-					this.plugin.settings.showTime = value;
-					await this.plugin.saveSettings();
-					this.plugin.refreshCalendarView();
-					timeFormatSetting.settingEl.style.display = value ? '' : 'none';
-				})
-			);
-
-		const timeFormatSetting = new Setting(containerEl)
-			.setName('Time display format')
-			.setDesc(this.buildTimeFormatDesc(this.plugin.settings.timeIsoDisplay))
-			.addText(text => text
-				.setPlaceholder('HH:mm:ss')
-				.setValue(this.plugin.settings.timeIsoDisplay)
-				.onChange(async (value) => {
-					this.plugin.settings.timeIsoDisplay = normalizeTimeDisplayFormat(value);
-					await this.plugin.saveSettings();
-					this.plugin.refreshCalendarView();
-					timeFormatSetting.setDesc(this.buildTimeFormatDesc(this.plugin.settings.timeIsoDisplay));
-				})
-			);
-		timeFormatSetting.settingEl.style.display = this.plugin.settings.showTime ? '' : 'none';
-
-		new Setting(containerEl)
 			.setName('Sort notes by')
 			.setDesc('Choose how notes are sorted in the note list.')
 			.addDropdown(dropdown => dropdown
@@ -182,6 +154,39 @@ export class CalendarSettingTab extends PluginSettingTab {
 					this.plugin.refreshCalendarView();
 				})
 			);
+
+		new Setting(containerEl)
+			.setName('Show creation time')
+			.setDesc('Display note creation time.')
+			.addToggle(toggle => toggle
+				.setValue(this.plugin.settings.showTime)
+				.onChange(async (value) => {
+					this.plugin.settings.showTime = value;
+					await this.plugin.saveSettings();
+					this.plugin.refreshCalendarView();
+					timeFormatSection.style.display = value ? '' : 'none';
+				})
+			);
+
+		const timeFormatSection = containerEl.createDiv();
+		timeFormatSection.style.marginLeft = '24px';
+		timeFormatSection.style.paddingLeft = '12px';
+		timeFormatSection.style.borderLeft = '1px solid var(--background-modifier-border)';
+
+		const timeFormatSetting = new Setting(timeFormatSection)
+			.setName('Time display format')
+			.setDesc(this.buildTimeFormatDesc(this.plugin.settings.timeIsoDisplay))
+			.addText(text => text
+				.setPlaceholder('HH:mm:ss')
+				.setValue(this.plugin.settings.timeIsoDisplay)
+				.onChange(async (value) => {
+					this.plugin.settings.timeIsoDisplay = normalizeTimeDisplayFormat(value);
+					await this.plugin.saveSettings();
+					this.plugin.refreshCalendarView();
+					timeFormatSetting.setDesc(this.buildTimeFormatDesc(this.plugin.settings.timeIsoDisplay));
+				})
+			);
+		timeFormatSection.style.display = this.plugin.settings.showTime ? '' : 'none';
 
 		new Setting(containerEl)
 			.setName('Show excerpt')
