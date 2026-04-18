@@ -3,7 +3,8 @@
 An Obsidian plugin for displaying a calendar in the side pane and notes associated with the selected date.
 
 ## Screenshots
-<img width="405" height="750" alt="Notes pane display showing the calendar and notes list." src="https://github.com/user-attachments/assets/1328a8ab-2a27-45ad-8750-9a4faaff0dfb" />
+<img width="254" height="652" alt="A screenshot of the plugin's interface, showing the notes calendar and the list." src="https://github.com/user-attachments/assets/ea6810ed-ba72-4d75-bf06-6b93e2feb7d2" />
+
 
 
 ## Features
@@ -13,8 +14,10 @@ An Obsidian plugin for displaying a calendar in the side pane and notes associat
 - Click a day to show notes created on that date
 - Click a week number to show notes created during that week
 - Optional week numbers, configurable week start day, and note indicators
+- Hide unnecessary days from the calendar
 - Optional creation time and note excerpt display
 - Configurable note sorting and excerpt line count
+- Special attention taken for iPad trackpad support
 
 ## Installation
 Open the Community Plugins tab in the settings and search for "Calendar Notes" (or [click here](https://obsidian.md/plugins?id=calendar-notes)).
