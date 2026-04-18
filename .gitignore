@@ -1,7 +1,7 @@
 # npm
 node_modules
 
-# Don't include compiled files, they should be built.
+# Don't include compiled files, they should be built (or copied for styles.css)
 dist
 main.js
 styles.css
