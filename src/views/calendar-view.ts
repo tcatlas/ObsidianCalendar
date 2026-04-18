@@ -547,7 +547,7 @@ export class CalendarView extends ItemView {
 		return content
 			.replace(/^---[\s\S]*?---\n?/, '')
 			.replace(/#+\s+.*/g, '')
-			.replace(/[\[\]*_`]/g, '')
+			.replace(/[[\]*_`]/g, '')
 			.replace(/\s+/g, ' ')
 			.trim();
 	}
