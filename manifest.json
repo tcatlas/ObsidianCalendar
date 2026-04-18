@@ -2,7 +2,7 @@
   "id": "notes-calendar",
   "name": "Notes Calendar",
   "version": "1.0.0",
-  "minAppVersion": "0.12.0",
+  "minAppVersion": "1.4.0",
   "description": "Displays a calendar with date pickers and a list of notes created on the selected date or week in the sidebar.",
   "author": "Travis Cochran",
   "authorUrl": "https://github.com/tcatlas/",

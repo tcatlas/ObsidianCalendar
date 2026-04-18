@@ -12,7 +12,7 @@ import {
 } from './settings';
 
 export default class CalendarPlugin extends Plugin {
-	settings: CalendarPluginSettings;
+	settings!: CalendarPluginSettings;
 
 	async onload(): Promise<void> {
 		console.log('Loading Obsidian Calendar Plugin');
@@ -50,7 +50,6 @@ export default class CalendarPlugin extends Plugin {
 
 	onunload(): void {
 		console.log('Unloading Obsidian Calendar Plugin');
-		this.app.workspace.detachLeavesOfType(VIEW_TYPE_CALENDAR);
 	}
 
 	async loadSettings(): Promise<void> {

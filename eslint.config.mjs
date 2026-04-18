@@ -4,10 +4,18 @@ import tseslint from "typescript-eslint";
 
 export default tseslint.config(
 	{
-		ignores: ["main.js"],
+		ignores: ["build/**"],
 	},
 	js.configs.recommended,
 	...tseslint.configs.recommended,
+	{
+		files: ["**/*.mjs"],
+		languageOptions: {
+			globals: {
+				...globals.node,
+			},
+		},
+	},
 	{
 		files: ["**/*.ts"],
 		languageOptions: {

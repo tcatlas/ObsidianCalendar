@@ -30,6 +30,8 @@ Open the Community Plugins tab in the settings and search for "Calendar Notes" (
 	- `main.js`
 	- `styles.css`
 	
+	After building, these files are located in the `build/` directory (`main.js` and `styles.css`) and the project root (`manifest.json`).
+	
 	Example layout:
 	
 	```text

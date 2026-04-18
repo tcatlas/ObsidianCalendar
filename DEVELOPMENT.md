@@ -15,7 +15,7 @@ npm install
 npm run dev
 ```
 
-5. Copy or symlink this plugin folder into your vault at:
+5. Copy or symlink the `build/` directory into your vault as the plugin folder:
 
 ```text
 <your-vault>/.obsidian/plugins/notes-calendar/
@@ -49,4 +49,4 @@ Production build:
 npm run production
 ```
 
-The build outputs `main.js`, which Obsidian loads together with `manifest.json` and `styles.css`.
+The build outputs `main.js` and `styles.css` into the `build/` directory. `manifest.json` is also copied there so the `build/` folder can be used directly as a plugin folder. Obsidian loads `main.js` together with `manifest.json` and `styles.css`.

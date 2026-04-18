@@ -1,5 +1,6 @@
 import esbuild from "esbuild";
 import process from "process";
+import { copyFileSync, mkdirSync, watch as fsWatch } from "fs";
 import builtinModules from "builtin-modules";
 
 const banner =
@@ -36,12 +37,24 @@ const context = await esbuild.context({
 	logLevel: 'info',
 	sourcemap: prod ? false : 'inline',
 	treeShaking: true,
-	outfile: 'main.js',
+	outfile: 'build/main.js',
 });
+
+mkdirSync('build', { recursive: true });
+copyFileSync('src/styles.css', 'build/styles.css');
+copyFileSync('manifest.json', 'build/manifest.json');
 
 if (prod) {
 	await context.rebuild();
 	process.exit(0);
 } else {
 	await context.watch();
+	fsWatch('src/styles.css', () => {
+		copyFileSync('src/styles.css', 'build/styles.css');
+		console.log('build/styles.css updated');
+	});
+	fsWatch('manifest.json', () => {
+		copyFileSync('manifest.json', 'build/manifest.json');
+		console.log('build/manifest.json updated');
+	});
 }

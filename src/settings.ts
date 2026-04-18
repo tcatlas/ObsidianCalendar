@@ -57,7 +57,7 @@ export function normalizeWeekNumberDisplay(value: string): WeekNumberDisplay {
 
 export function normalizeExcerptLines(value: number): number {
 	if (value < 1) return 1;
-	if (value > 3) return 3;
+	if (value > 5) return 5;
 	return Math.round(value);
 }
 

@@ -17,6 +17,8 @@ export class CalendarView extends ItemView {
 	private headerSelectorPopover: HTMLElement | null = null;
 	private activeHeaderSelector: 'month' | 'year' | null = null;
 	private yearSelectorCenter: number;
+	private modifyDebounceTimer: ReturnType<typeof setTimeout> | null = null;
+	private refreshGeneration = 0;
 
 	constructor(leaf: WorkspaceLeaf, plugin: CalendarPlugin) {
 		super(leaf);
@@ -44,7 +46,10 @@ export class CalendarView extends ItemView {
 		this.registerEvent(this.app.vault.on('create', () => this.refresh()));
 		this.registerEvent(this.app.vault.on('delete', () => this.refresh()));
 		this.registerEvent(this.app.vault.on('rename', () => this.refresh()));
-		this.registerEvent(this.app.vault.on('modify', () => this.refresh()));
+		this.registerEvent(this.app.vault.on('modify', () => {
+			if (this.modifyDebounceTimer) clearTimeout(this.modifyDebounceTimer);
+			this.modifyDebounceTimer = setTimeout(() => this.refresh(), 400);
+		}));
 		this.registerDomEvent(document, 'click', (event) => {
 			if (!this.activeHeaderSelector || !this.monthDisplayContainer) return;
 			if (!this.monthDisplayContainer.contains(event.target as Node)) {
@@ -54,11 +59,12 @@ export class CalendarView extends ItemView {
 	}
 
 	async onClose(): Promise<void> {
-		// Nothing to clean up — registerEvent handles detaching listeners
+		if (this.modifyDebounceTimer) clearTimeout(this.modifyDebounceTimer);
 	}
 
 	// Called by the plugin when settings change
 	public refresh(): void {
+		this.refreshGeneration++;
 		this.renderHeader();
 		this.renderCalendar();
 		this.updateNotesList();
@@ -134,6 +140,7 @@ export class CalendarView extends ItemView {
 		const firstDay = this.getFirstDayOffset(new Date(year, month, 1).getDay());
 		const daysInMonth = new Date(year, month + 1, 0).getDate();
 		const totalWeeks = Math.ceil((firstDay + daysInMonth) / 7);
+		const noteCountMap = this.buildNoteCountMap(year, month);
 
 		for (let week = 0; week < totalWeeks; week++) {
 			const weekStartDate = this.getCalendarRowStartDate(year, month, week, firstDay);
@@ -164,7 +171,7 @@ export class CalendarView extends ItemView {
 				dayNumber.setText(day.toString());
 
 				// Dash indicators — always render the row to keep all cells the same height
-				const noteCount = this.countNotesForDate(date);
+				const noteCount = noteCountMap.get(day) ?? 0;
 				const dashCount = this.getDashCount(noteCount);
 				const dashEl = dayCell.createDiv('calendar-day-dashes');
 				if (this.plugin.settings.showDashes && dashCount > 0) {
@@ -447,7 +454,9 @@ export class CalendarView extends ItemView {
 				excerptEl.style.setProperty('line-clamp', String(this.plugin.settings.excerptLines));
 				excerptEl.style.setProperty('-webkit-line-clamp', String(this.plugin.settings.excerptLines));
 				excerptEl.setText('...');
+				const generation = this.refreshGeneration;
 				this.app.vault.cachedRead(note).then(content => {
+					if (this.refreshGeneration !== generation) return;
 					const text = content
 						.replace(/^---[\s\S]*?---\n?/, '')  // strip frontmatter
 						.replace(/#+\s+.*/g, '')             // strip headings
@@ -455,7 +464,9 @@ export class CalendarView extends ItemView {
 						.replace(/\s+/g, ' ')
 						.trim();
 					excerptEl.setText(text || '—');
-				}).catch(() => excerptEl.setText('—'));
+				}).catch(() => {
+					if (this.refreshGeneration === generation) excerptEl.setText('—');
+				});
 			}
 		});
 	}
@@ -502,10 +513,16 @@ export class CalendarView extends ItemView {
 		});
 	}
 
-	private countNotesForDate(date: Date): number {
-		return this.app.vault.getMarkdownFiles().filter(file =>
-			this.isNoteCreatedOnDate(file, date)
-		).length;
+	private buildNoteCountMap(year: number, month: number): Map<number, number> {
+		const map = new Map<number, number>();
+		this.app.vault.getMarkdownFiles().forEach(file => {
+			const fileDate = new Date(file.stat.ctime);
+			if (fileDate.getFullYear() === year && fileDate.getMonth() === month) {
+				const day = fileDate.getDate();
+				map.set(day, (map.get(day) ?? 0) + 1);
+			}
+		});
+		return map;
 	}
 
 	private getDashCount(noteCount: number): number {
@@ -533,10 +550,9 @@ export class CalendarView extends ItemView {
 	}
 
 	private formatDate(date: Date): string {
-		const month = String(date.getMonth() + 1).padStart(2, '0');
-		const day = String(date.getDate()).padStart(2, '0');
+		const pad = (n: number): string => ('0' + String(n)).slice(-2);
 		const year = date.getFullYear();
-		return `${year}-${month}-${day}`;
+		return `${year}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
 	}
 
 	private getQuarterLabel(date: Date): string {
