@@ -1,4 +1,4 @@
-import { WorkspaceLeaf, ItemView, TFile } from 'obsidian';
+import { WorkspaceLeaf, ItemView, TFile, setIcon } from 'obsidian';
 import type CalendarPlugin from '../main';
 import { formatDateTime } from '../settings';
 
@@ -81,9 +81,10 @@ export class CalendarView extends ItemView {
 		// Create header with month/year and navigation
 		const header = mainContainer.createDiv('calendar-header');
 		
-		const prevButton = header.createEl('button', { text: '←' });
-		prevButton.addClass('calendar-nav-button');
-		prevButton.onclick = () => this.previousMonth();
+		const todayButton = header.createEl('button', { attr: { 'aria-label': 'Go to today' } });
+		todayButton.addClass('calendar-nav-button', 'calendar-today-button');
+		setIcon(todayButton, 'calendar-1');
+		todayButton.onclick = () => this.goToToday();
 
 		this.monthDisplayContainer = header.createDiv('calendar-month-display');
 		this.monthDisplayButton = this.monthDisplayContainer.createEl('button', { cls: 'calendar-month-display-button' });
@@ -101,7 +102,13 @@ export class CalendarView extends ItemView {
 		};
 		this.renderHeader();
 
-		const nextButton = header.createEl('button', { text: '→' });
+		const navGroup = header.createDiv('calendar-nav-group');
+
+		const prevButton = navGroup.createEl('button', { text: '←' });
+		prevButton.addClass('calendar-nav-button');
+		prevButton.onclick = () => this.previousMonth();
+
+		const nextButton = navGroup.createEl('button', { text: '→' });
 		nextButton.addClass('calendar-nav-button');
 		nextButton.onclick = () => this.nextMonth();
 
@@ -269,6 +276,18 @@ export class CalendarView extends ItemView {
 			1
 		);
 		this.yearSelectorCenter = this.currentDate.getFullYear();
+		this.renderHeader();
+		this.renderCalendar();
+		this.updateNotesList();
+	}
+
+	private goToToday() {
+		this.closeHeaderSelector();
+		const now = new Date();
+		this.currentDate = new Date(now.getFullYear(), now.getMonth(), 1);
+		this.selectedDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+		this.selectedWeekStart = null;
+		this.yearSelectorCenter = now.getFullYear();
 		this.renderHeader();
 		this.renderCalendar();
 		this.updateNotesList();
