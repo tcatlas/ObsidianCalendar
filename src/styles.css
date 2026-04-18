@@ -6,12 +6,49 @@
 	padding: 6px 8px;
 	font-family: var(--font-family);
 	font-size: var(--font-size-ui);
-	-webkit-tap-highlight-color: transparent;
+}
+
+.calendar-main-container button,
+.calendar-main-container a,
+.calendar-main-container .calendar-day,
+.calendar-main-container .calendar-note-item,
+.calendar-main-container .calendar-week-number {
+	-webkit-tap-highlight-color: transparent !important;
 }
 
 .calendar-main-container button {
-	-webkit-appearance: none;
-	appearance: none;
+	-webkit-appearance: none !important;
+	appearance: none !important;
+	background: none !important;
+	border: none !important;
+	color: inherit;
+	padding: 0;
+	margin: 0;
+	font: inherit;
+}
+
+.calendar-nav-button:active {
+	background: var(--background-tertiary) !important;
+}
+
+.calendar-month-display-button:active {
+	background: var(--background-secondary) !important;
+}
+
+.calendar-header-selector-option:active {
+	background: var(--background-modifier-hover) !important;
+}
+
+.calendar-day:active:not(.calendar-day-selected) {
+	background: var(--background-secondary) !important;
+}
+
+.calendar-note-item:active {
+	background: var(--background-secondary) !important;
+}
+
+button:not(.clickable-icon) {
+    box-shadow: none;
 }
 
 /* Header with navigation */
@@ -24,7 +61,6 @@
 }
 
 .calendar-month-display {
-	flex: 1;
 	text-align: center;
 	display: flex;
 	justify-content: center;
@@ -55,7 +91,8 @@
 	left: 50%;
 	transform: translateX(-50%);
 	z-index: 20;
-	min-width: 220px;
+	min-width: 180px;
+	max-width: calc(100vw - 40px);
 	padding: 8px;
 	border: 1px solid var(--background-modifier-border);
 	border-radius: 8px;
@@ -101,8 +138,11 @@
 	color: var(--text-normal);
 	cursor: pointer;
 	font-size: 11px;
-	padding: 8px 6px;
+	padding: 8px 4px;
 	text-align: center;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
 }
 
 .calendar-header-selector-option:hover {
@@ -238,7 +278,7 @@
 	align-items: center;
 	justify-content: space-between;
 	padding: 2px 1px 2px;
-	background: var(--background-secondary);
+	background: transparent;
 	border: 1px solid var(--background-tertiary);
 	border-radius: 3px;
 	cursor: pointer;
@@ -283,6 +323,7 @@
 
 .calendar-day:hover:not(.calendar-empty-day) {
 	border-color: var(--interactive-accent);
+	background: var(--background-secondary);
 	transform: translateY(-1px);
 }
 
@@ -295,7 +336,7 @@
 
 .calendar-day-in-selected-week {
 	border-color: var(--interactive-accent-hover);
-	background: color-mix(in srgb, var(--interactive-accent) 12%, var(--background-secondary));
+	background: color-mix(in srgb, var(--interactive-accent) 12%, transparent);
 }
 
 .calendar-day-selected .calendar-day-dash {
@@ -337,7 +378,7 @@
 
 .calendar-note-item {
 	padding: 6px 8px;
-	background: var(--background-secondary);
+	background: transparent;
 	border-left: 3px solid var(--interactive-accent);
 	border-radius: 2px;
 	transition: background-color 0.2s ease, border-color 0.2s ease;
@@ -345,24 +386,44 @@
 }
 
 .calendar-note-item:hover {
-	background: var(--background-modifier-hover);
 	border-left-color: var(--interactive-accent-hover);
 }
 
-.calendar-note-item a {
+@media (hover: hover) {
+	.calendar-note-item:hover {
+		background: var(--background-modifier-hover);
+	}
+}
+
+@media (any-hover: hover) {
+	body.is-mobile .calendar-note-item:hover {
+		background: var(--background-modifier-hover) !important;
+	}
+}
+
+.calendar-note-name {
 	color: var(--text-accent);
 	text-decoration: none;
 	font-size: 13px;
-	cursor: pointer;
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
 	display: block;
 }
 
-.calendar-note-item a:hover {
+.calendar-note-name:hover {
 	text-decoration: none;
+	color: var(--text-accent);
 }
+
+body.is-mobile .calendar-note-name,
+body.is-mobile .calendar-note-name:hover,
+body.is-mobile .calendar-note-name:focus,
+body.is-mobile .calendar-note-name:active {
+	color: var(--text-accent) !important;
+	text-decoration: none !important;
+}
+
 .calendar-note-time {
 	font-size: 10px;
 	color: var(--text-faint);
@@ -413,4 +474,40 @@
 	.calendar-main-container {
 		padding: 8px;
 	}
+}
+
+/* Mobile overrides — Obsidian adds .is-mobile on iOS/Android */
+body.is-mobile .calendar-day,
+body.is-mobile .calendar-empty-day {
+	background: transparent !important;
+	box-shadow: none !important;
+}
+
+body.is-mobile .calendar-day-selected {
+	background: var(--interactive-accent) !important;
+	border-color: var(--interactive-accent) !important;
+}
+
+body.is-mobile .calendar-day-in-selected-week {
+	border-color: var(--interactive-accent-hover) !important;
+	background: color-mix(in srgb, var(--interactive-accent) 12%, transparent) !important;
+}
+
+body.is-mobile .calendar-note-item {
+	background: transparent !important;
+	box-shadow: none !important;
+}
+
+body.is-mobile .calendar-note-item:active {
+	background: var(--background-secondary) !important;
+}
+
+body.is-mobile .calendar-month-display {
+	gap: 1px !important;
+}
+
+body.is-mobile .calendar-month-display-button {
+	padding: 2px 3px;
+	margin: 0 !important;
+	min-width: 0 !important;
 }

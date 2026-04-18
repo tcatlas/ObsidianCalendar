@@ -348,7 +348,9 @@ export class CalendarView extends ItemView {
 
 	private renderMonthSelector(popover: HTMLElement) {
 		const grid = popover.createDiv('calendar-header-selector-grid');
-		this.getMonthNames().forEach((month, index) => {
+		const shortNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+			'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+		shortNames.forEach((month, index) => {
 			const button = grid.createEl('button', {
 				cls: 'calendar-header-selector-option',
 				text: month,
@@ -459,15 +461,9 @@ export class CalendarView extends ItemView {
 				timeEl.setText(formatDateTime(createdTime, this.plugin.settings.timeIsoDisplay));
 			}
 
-			// Note name link
-			const noteLink = noteItem.createEl('a', { cls: 'calendar-note-name' });
-			noteLink.href = '#';
+			// Note name text (row click opens the note)
+			const noteLink = noteItem.createDiv('calendar-note-name');
 			noteLink.setText(note.basename || note.name);
-			noteLink.onclick = (e) => {
-				e.preventDefault();
-				e.stopPropagation();
-				this.app.workspace.getLeaf(false).openFile(note);
-			};
 
 			// Excerpt — read async and populate when ready
 			if (this.plugin.settings.showExcerpt) {
