@@ -6,6 +6,24 @@ export type WeekStartDay = 'monday' | 'sunday';
 export type WeekNumberDisplay = 'off' | 'iso-8601' | 'united-states';
 export type NoteSortBy = 'name' | 'creation-time';
 export type SortOrder = 'ascending' | 'descending';
+export type WeekdayVisibilityKey =
+	| 'showSunday'
+	| 'showMonday'
+	| 'showTuesday'
+	| 'showWednesday'
+	| 'showThursday'
+	| 'showFriday'
+	| 'showSaturday';
+
+const WEEKDAY_VISIBILITY_KEYS: WeekdayVisibilityKey[] = [
+	'showSunday',
+	'showMonday',
+	'showTuesday',
+	'showWednesday',
+	'showThursday',
+	'showFriday',
+	'showSaturday',
+];
 
 export interface CalendarPluginSettings {
 	showDashes: boolean;
@@ -20,6 +38,13 @@ export interface CalendarPluginSettings {
 	noteSortOrder: SortOrder;
 	weekStartDay: WeekStartDay;
 	weekNumberDisplay: WeekNumberDisplay;
+	showSunday: boolean;
+	showMonday: boolean;
+	showTuesday: boolean;
+	showWednesday: boolean;
+	showThursday: boolean;
+	showFriday: boolean;
+	showSaturday: boolean;
 }
 
 export const DEFAULT_SETTINGS: CalendarPluginSettings = {
@@ -35,6 +60,13 @@ export const DEFAULT_SETTINGS: CalendarPluginSettings = {
 	noteSortOrder: 'ascending',
 	weekStartDay: 'sunday',
 	weekNumberDisplay: 'off',
+	showSunday: true,
+	showMonday: true,
+	showTuesday: true,
+	showWednesday: true,
+	showThursday: true,
+	showFriday: true,
+	showSaturday: true,
 };
 
 export function normalizeTimeDisplayFormat(value: string): TimeDisplayFormat {
@@ -67,6 +99,19 @@ export function normalizeNoteSortBy(value: string): NoteSortBy {
 
 export function normalizeSortOrder(value: string): SortOrder {
 	return value === 'descending' ? 'descending' : 'ascending';
+}
+
+export function normalizeWeekdayVisibility(settings: CalendarPluginSettings): void {
+	WEEKDAY_VISIBILITY_KEYS.forEach((key) => {
+		settings[key] = settings[key] !== false;
+	});
+
+	const hasVisibleDay = WEEKDAY_VISIBILITY_KEYS.some((key) => settings[key]);
+	if (!hasVisibleDay) {
+		WEEKDAY_VISIBILITY_KEYS.forEach((key) => {
+			settings[key] = true;
+		});
+	}
 }
 
 export function formatDateTime(date: Date, format: TimeDisplayFormat): string {
@@ -255,6 +300,44 @@ export class CalendarSettingTab extends PluginSettingTab {
 					this.plugin.refreshCalendarView();
 				})
 			);
+
+		const dayVisibilitySetting = new Setting(containerEl)
+			.setName('Days to show')
+			.setDesc('Choose which weekdays are visible in the calendar.');
+		dayVisibilitySetting.controlEl.empty();
+		const dayCheckboxRow = dayVisibilitySetting.controlEl.createDiv();
+		dayCheckboxRow.style.display = 'flex';
+		dayCheckboxRow.style.flexWrap = 'wrap';
+		dayCheckboxRow.style.alignItems = 'center';
+		dayCheckboxRow.style.justifyContent = 'flex-end';
+		dayCheckboxRow.style.gap = '10px';
+
+		const dayOptions: Array<{ key: WeekdayVisibilityKey; label: string }> = [
+			{ key: 'showSunday', label: 'Sun' },
+			{ key: 'showMonday', label: 'Mon' },
+			{ key: 'showTuesday', label: 'Tue' },
+			{ key: 'showWednesday', label: 'Wed' },
+			{ key: 'showThursday', label: 'Thu' },
+			{ key: 'showFriday', label: 'Fri' },
+			{ key: 'showSaturday', label: 'Sat' },
+		];
+
+		dayOptions.forEach(({ key, label }) => {
+			const row = dayCheckboxRow.createEl('label', {
+				attr: { style: 'display:flex; align-items:center; gap:6px; margin:0;' },
+			});
+			const checkbox = row.createEl('input', { type: 'checkbox' });
+			checkbox.checked = this.plugin.settings[key];
+			row.createSpan({ text: label });
+
+			checkbox.onchange = async () => {
+				this.plugin.settings[key] = checkbox.checked;
+				normalizeWeekdayVisibility(this.plugin.settings);
+				await this.plugin.saveSettings();
+				this.plugin.refreshCalendarView();
+				this.display();
+			};
+		});
 
 		new Setting(containerEl)
 			.setName('Show note indicators')

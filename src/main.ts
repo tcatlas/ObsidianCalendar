@@ -9,6 +9,7 @@ import {
 	normalizeSortOrder,
 	normalizeWeekNumberDisplay,
 	normalizeTimeDisplayFormat,
+	normalizeWeekdayVisibility,
 } from './settings';
 
 export default class CalendarPlugin extends Plugin {
@@ -59,6 +60,7 @@ export default class CalendarPlugin extends Plugin {
 		this.settings.noteSortBy = normalizeNoteSortBy(this.settings.noteSortBy ?? '');
 		this.settings.noteSortOrder = normalizeSortOrder(this.settings.noteSortOrder ?? '');
 		this.settings.weekNumberDisplay = normalizeWeekNumberDisplay(this.settings.weekNumberDisplay ?? '');
+		normalizeWeekdayVisibility(this.settings);
 	}
 
 	async saveSettings(): Promise<void> {

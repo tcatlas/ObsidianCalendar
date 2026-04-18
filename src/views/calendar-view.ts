@@ -126,19 +126,20 @@ export class CalendarView extends ItemView {
 
 		this.calendarContainer.empty();
 		const showWeekNumbers = this.plugin.settings.weekNumberDisplay !== 'off';
+		const visibleWeekdays = this.getVisibleWeekdays();
+		const visibleWeekdayCount = visibleWeekdays.length;
 		this.calendarContainer.style.gridTemplateColumns = showWeekNumbers
-			? 'auto repeat(7, 1fr)'
-			: 'repeat(7, 1fr)';
+			? `auto repeat(${visibleWeekdayCount}, 1fr)`
+			: `repeat(${visibleWeekdayCount}, 1fr)`;
 
 		// Add day labels
 		if (showWeekNumbers) {
 			const weekLabel = this.calendarContainer.createDiv('calendar-week-label');
 			weekLabel.setText(this.getQuarterLabel(this.currentDate));
 		}
-		const daysOfWeek = this.getDaysOfWeek();
-		daysOfWeek.forEach(day => {
+		visibleWeekdays.forEach(({ label }) => {
 			const dayLabel = this.calendarContainer!.createDiv('calendar-day-label');
-			dayLabel.setText(day);
+			dayLabel.setText(label);
 		});
 
 		// Get first day of month and number of days
@@ -165,8 +166,8 @@ export class CalendarView extends ItemView {
 				weekNumberCell.onclick = () => this.selectWeek(weekStartDate);
 			}
 
-			for (let dayIndex = 0; dayIndex < 7; dayIndex++) {
-				const day = week * 7 + dayIndex - firstDay + 1;
+			for (const weekday of visibleWeekdays) {
+				const day = week * 7 + weekday.displayIndex - firstDay + 1;
 				if (day < 1 || day > daysInMonth) {
 					this.calendarContainer.createDiv('calendar-empty-day');
 					continue;
@@ -212,6 +213,57 @@ export class CalendarView extends ItemView {
 			return ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 		}
 		return ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+	}
+
+	private getVisibleWeekdays(): Array<{ label: string; absoluteDay: number; displayIndex: number }> {
+		const orderedDays = this.getOrderedWeekdays();
+		const visibleDays = orderedDays.filter(({ absoluteDay }) => this.isWeekdayVisible(absoluteDay));
+		return visibleDays.length > 0 ? visibleDays : orderedDays;
+	}
+
+	private getOrderedWeekdays(): Array<{ label: string; absoluteDay: number; displayIndex: number }> {
+		if (this.plugin.settings.weekStartDay === 'monday') {
+			return [
+				{ label: 'Mon', absoluteDay: 1, displayIndex: 0 },
+				{ label: 'Tue', absoluteDay: 2, displayIndex: 1 },
+				{ label: 'Wed', absoluteDay: 3, displayIndex: 2 },
+				{ label: 'Thu', absoluteDay: 4, displayIndex: 3 },
+				{ label: 'Fri', absoluteDay: 5, displayIndex: 4 },
+				{ label: 'Sat', absoluteDay: 6, displayIndex: 5 },
+				{ label: 'Sun', absoluteDay: 0, displayIndex: 6 },
+			];
+		}
+
+		return [
+			{ label: 'Sun', absoluteDay: 0, displayIndex: 0 },
+			{ label: 'Mon', absoluteDay: 1, displayIndex: 1 },
+			{ label: 'Tue', absoluteDay: 2, displayIndex: 2 },
+			{ label: 'Wed', absoluteDay: 3, displayIndex: 3 },
+			{ label: 'Thu', absoluteDay: 4, displayIndex: 4 },
+			{ label: 'Fri', absoluteDay: 5, displayIndex: 5 },
+			{ label: 'Sat', absoluteDay: 6, displayIndex: 6 },
+		];
+	}
+
+	private isWeekdayVisible(absoluteDay: number): boolean {
+		switch (absoluteDay) {
+			case 0:
+				return this.plugin.settings.showSunday;
+			case 1:
+				return this.plugin.settings.showMonday;
+			case 2:
+				return this.plugin.settings.showTuesday;
+			case 3:
+				return this.plugin.settings.showWednesday;
+			case 4:
+				return this.plugin.settings.showThursday;
+			case 5:
+				return this.plugin.settings.showFriday;
+			case 6:
+				return this.plugin.settings.showSaturday;
+			default:
+				return true;
+		}
 	}
 
 	private getWeekNumber(date: Date): number {
